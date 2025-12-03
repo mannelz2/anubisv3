@@ -1,10 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import type { CreateTransactionRequest, Transaction } from './genesysApi';
+import { getWebhookUrl, SUPABASE_URL, SUPABASE_ANON_KEY } from '../config/app';
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export interface AureoConfig {
   apiUrl: string;
@@ -40,7 +38,7 @@ export async function createAureoTransaction(
       paymentMethod: 'pix',
       status: 'waiting_payment',
       installments: 1,
-      postbackUrl: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/aureo-webhook`,
+      postbackUrl: getWebhookUrl('aureo-webhook'),
       ip: '127.0.0.1',
       externalRef: `pix_${objectId}`,
       items: [

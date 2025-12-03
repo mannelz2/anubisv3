@@ -4,11 +4,9 @@ import { ArrowLeft, Save, AlertCircle, CheckCircle2, Settings, CreditCard } from
 import { createClient } from '@supabase/supabase-js';
 import UserLogsViewer from '../components/UserLogsViewer';
 import ReceiptsViewer from '../components/ReceiptsViewer';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../config/app';
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 interface ProviderSettings {
   id?: string;

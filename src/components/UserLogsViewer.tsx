@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { RefreshCw, Search, Filter, ChevronDown, ChevronUp } from 'lucide-react';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../config/app';
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 interface UserLog {
   id: string;

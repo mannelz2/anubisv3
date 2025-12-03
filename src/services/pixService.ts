@@ -3,11 +3,9 @@ import { createTransaction as createGenesysTransaction, getTransactionStatus as 
 import { createMangofyTransaction, getMangofyTransactionStatus, type MangofyConfig } from './mangofyApi';
 import { createAureoTransaction, getAureoTransactionStatus, type AureoConfig } from './aureoApi';
 import { getNextProductName } from '../utils/productNameRotation';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../config/app';
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export { supabase };
 

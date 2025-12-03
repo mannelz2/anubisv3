@@ -1,9 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
+import { getWebhookUrl, SUPABASE_URL, SUPABASE_ANON_KEY } from '../config/app';
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 async function getGenesysConfig() {
   const { data, error } = await supabase
@@ -107,7 +105,7 @@ export async function createTransaction(data: CreateTransactionRequest): Promise
         external_id: externalId,
         total_amount: data.amount,
         payment_method: 'PIX',
-        webhook_url: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/genesys-webhook`,
+        webhook_url: getWebhookUrl('genesys-webhook'),
         items: [
           {
             id: 'product_' + Date.now(),
