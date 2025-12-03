@@ -70,7 +70,7 @@ Deno.serve(async (req: Request) => {
       installments: 1,
       payment_amount: amountInCents,
       shipping_amount: 0,
-      postback_url: `${Deno.env.get("SUPABASE_URL")}/functions/v1/mangofy-webhook`,
+      postback_url: `${Deno.env.get("APP_URL")}/functions/v1/mangofy-webhook`,
       items: [
         {
           name: data.productName || "Produto Digital",
