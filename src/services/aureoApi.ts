@@ -132,7 +132,7 @@ export async function createAureoTransaction(
       qr_code: qrCodeText,
       qr_code_image: qrCodeImage,
       cpf: data.cpf,
-      genesys_transaction_id: (aureoTransaction.data?.id || aureoTransaction.id || transactionId).toString(),
+      external_transaction_id: (aureoTransaction.data?.id || aureoTransaction.id || transactionId).toString(),
       provider: 'aureo',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),

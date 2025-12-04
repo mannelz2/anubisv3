@@ -113,7 +113,7 @@ export async function getTransactionStatus(transactionId: string): Promise<Trans
 
     newStatus = await getAureoTransactionStatus(
       aureoConfig,
-      transaction.genesys_transaction_id
+      transaction.external_transaction_id || transaction.genesys_transaction_id
     );
   } else if (provider.provider === 'mangofy') {
     if (!provider.store_code) {
@@ -128,7 +128,7 @@ export async function getTransactionStatus(transactionId: string): Promise<Trans
 
     newStatus = await getMangofyTransactionStatus(
       mangofyConfig,
-      transaction.genesys_transaction_id
+      transaction.external_transaction_id || transaction.genesys_transaction_id
     );
   } else {
     const updatedTransaction = await getGenesysTransactionStatus(transactionId);
