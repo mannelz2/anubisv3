@@ -126,6 +126,26 @@ Deno.serve(async (req: Request) => {
 
     console.log("Transaction updated successfully:", updatedTransaction.id);
 
+    try {
+      const utmifyUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/utmify-integration`;
+      const utmifyResponse = await fetch(utmifyUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Deno.env.get("SUPABASE_ANON_KEY")}`,
+        },
+        body: JSON.stringify({ transactionId: updatedTransaction.id }),
+      });
+
+      if (!utmifyResponse.ok) {
+        console.error("Failed to send to Utmify:", await utmifyResponse.text());
+      } else {
+        console.log("Successfully sent transaction to Utmify");
+      }
+    } catch (utmifyError) {
+      console.error("Error sending to Utmify:", utmifyError);
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
