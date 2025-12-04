@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download, TrendingUp, DollarSign, Users, Target, Calendar, Filter, AlertCircle } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../config/app';
+import { consultarCPF } from '../services/cpfApi';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -82,7 +83,22 @@ export default function AnalyticsPage() {
 
       if (error) throw error;
 
-      setTransactions(data || []);
+      const transactionsWithNames = await Promise.all(
+        (data || []).map(async (transaction) => {
+          if (!transaction.customer_name && transaction.cpf) {
+            const cpfData = await consultarCPF(transaction.cpf);
+            if (cpfData && cpfData.nome) {
+              return {
+                ...transaction,
+                customer_name: cpfData.nome,
+              };
+            }
+          }
+          return transaction;
+        })
+      );
+
+      setTransactions(transactionsWithNames);
     } catch (err) {
       console.error('Error loading transactions:', err);
     } finally {
