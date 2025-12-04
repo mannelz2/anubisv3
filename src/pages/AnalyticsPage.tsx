@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, TrendingUp, DollarSign, Users, Target, Calendar, Filter } from 'lucide-react';
+import { ArrowLeft, Download, TrendingUp, DollarSign, Users, Target, Calendar, Filter, AlertCircle } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../config/app';
 
@@ -299,6 +299,22 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
+        {transactions.length > 0 && (
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <AlertCircle className="h-5 w-5 text-blue-400" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-blue-700">
+                  <strong>Nota:</strong> Transações criadas antes da implementação do sistema de tracking não terão dados de campanha/cliente.
+                  Novas transações capturarão automaticamente todos os dados de tracking (UTM, Facebook Ads, informações do cliente, etc).
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <div className="flex items-center gap-2 mb-4">
             <Filter className="w-5 h-5 text-gray-600" />
@@ -400,8 +416,12 @@ export default function AnalyticsPage() {
                         {new Date(transaction.created_at).toLocaleString('pt-BR')}
                       </td>
                       <td className="px-6 py-4 text-sm">
-                        <div className="text-gray-900 font-medium">{transaction.customer_name || 'N/A'}</div>
-                        <div className="text-gray-500">{transaction.customer_email || 'N/A'}</div>
+                        <div className="text-gray-900 font-medium">
+                          {transaction.customer_name || (transaction.cpf ? `CPF: ${transaction.cpf}` : 'Sem dados')}
+                        </div>
+                        <div className="text-gray-500 text-xs">
+                          {transaction.customer_email || (transaction.customer_phone || 'Email não disponível')}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {formatCurrency(transaction.amount)}
@@ -411,14 +431,26 @@ export default function AnalyticsPage() {
                           {transaction.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {transaction.fb_campaign_name || transaction.utm_campaign || '-'}
+                      <td className="px-6 py-4 text-sm">
+                        {transaction.fb_campaign_name || transaction.utm_campaign ? (
+                          <span className="text-gray-900">{transaction.fb_campaign_name || transaction.utm_campaign}</span>
+                        ) : (
+                          <span className="text-gray-400 italic">Sem dados</span>
+                        )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {transaction.fb_adset_name || '-'}
+                      <td className="px-6 py-4 text-sm">
+                        {transaction.fb_adset_name ? (
+                          <span className="text-gray-900">{transaction.fb_adset_name}</span>
+                        ) : (
+                          <span className="text-gray-400 italic">Sem dados</span>
+                        )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {transaction.fb_ad_name || '-'}
+                      <td className="px-6 py-4 text-sm">
+                        {transaction.fb_ad_name ? (
+                          <span className="text-gray-900">{transaction.fb_ad_name}</span>
+                        ) : (
+                          <span className="text-gray-400 italic">Sem dados</span>
+                        )}
                       </td>
                     </tr>
                   ))
