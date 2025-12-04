@@ -6,6 +6,17 @@ import Footer from '../components/Footer';
 import UserMenu from '../components/UserMenu';
 import { navigateWithParams } from '../utils/urlParams';
 
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'vturb-smartplayer': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        id?: string;
+        style?: React.CSSProperties;
+      };
+    }
+  }
+}
+
 export default function VSLPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,63 +44,15 @@ export default function VSLPage() {
   }, [countdown]);
 
   useEffect(() => {
-    const script1 = document.createElement('script');
-    script1.innerHTML = `!function(i,n){i._plt=i._plt||(n&&n.timeOrigin?n.timeOrigin+n.now():Date.now())}(window,performance);`;
-    document.head.appendChild(script1);
-
-    const preloadEmbed = document.createElement('link');
-    preloadEmbed.rel = 'preload';
-    preloadEmbed.href = 'https://scripts.converteai.net/f5ab9e88-cc1b-4dce-a537-c7de7e019d8b/players/692e3b983dbab420e99085ca/v4/embed.html';
-    document.head.appendChild(preloadEmbed);
-
-    const preloadPlayer = document.createElement('link');
-    preloadPlayer.rel = 'preload';
-    preloadPlayer.href = 'https://scripts.converteai.net/f5ab9e88-cc1b-4dce-a537-c7de7e019d8b/players/692e3b983dbab420e99085ca/v4/player.js';
-    preloadPlayer.as = 'script';
-    document.head.appendChild(preloadPlayer);
-
-    const preloadSmartplayer = document.createElement('link');
-    preloadSmartplayer.rel = 'preload';
-    preloadSmartplayer.href = 'https://scripts.converteai.net/lib/js/smartplayer-wc/v4/smartplayer.js';
-    preloadSmartplayer.as = 'script';
-    document.head.appendChild(preloadSmartplayer);
-
-    const preloadVideo = document.createElement('link');
-    preloadVideo.rel = 'preload';
-    preloadVideo.href = 'https://cdn.converteai.net/f5ab9e88-cc1b-4dce-a537-c7de7e019d8b/692e3b878c029b83a0a378e2/main.m3u8';
-    preloadVideo.as = 'fetch';
-    document.head.appendChild(preloadVideo);
-
-    const dnsPrefetch1 = document.createElement('link');
-    dnsPrefetch1.rel = 'dns-prefetch';
-    dnsPrefetch1.href = 'https://cdn.converteai.net';
-    document.head.appendChild(dnsPrefetch1);
-
-    const dnsPrefetch2 = document.createElement('link');
-    dnsPrefetch2.rel = 'dns-prefetch';
-    dnsPrefetch2.href = 'https://scripts.converteai.net';
-    document.head.appendChild(dnsPrefetch2);
-
-    const dnsPrefetch3 = document.createElement('link');
-    dnsPrefetch3.rel = 'dns-prefetch';
-    dnsPrefetch3.href = 'https://images.converteai.net';
-    document.head.appendChild(dnsPrefetch3);
-
-    const dnsPrefetch4 = document.createElement('link');
-    dnsPrefetch4.rel = 'dns-prefetch';
-    dnsPrefetch4.href = 'https://api.vturb.com.br';
-    document.head.appendChild(dnsPrefetch4);
+    const playerScript = document.createElement('script');
+    playerScript.src = 'https://scripts.converteai.net/4d4e70f9-0240-4c3c-b9ad-d61479b06700/players/6930f7cb8f0253bca6641105/v4/player.js';
+    playerScript.async = true;
+    document.head.appendChild(playerScript);
 
     return () => {
-      document.head.removeChild(script1);
-      document.head.removeChild(preloadEmbed);
-      document.head.removeChild(preloadPlayer);
-      document.head.removeChild(preloadSmartplayer);
-      document.head.removeChild(preloadVideo);
-      document.head.removeChild(dnsPrefetch1);
-      document.head.removeChild(dnsPrefetch2);
-      document.head.removeChild(dnsPrefetch3);
-      document.head.removeChild(dnsPrefetch4);
+      if (document.head.contains(playerScript)) {
+        document.head.removeChild(playerScript);
+      }
     };
   }, []);
 
@@ -166,15 +129,11 @@ export default function VSLPage() {
               </div>
             </div>
 
-            <div className="relative w-full rounded-xl overflow-hidden bg-gray-900 shadow-md" style={{ paddingTop: '133.33%' }}>
-              <iframe
-                id="panda-692e3b98-3dba-b420-e990-85ca"
-                src="https://scripts.converteai.net/f5ab9e88-cc1b-4dce-a537-c7de7e019d8b/players/692e3b983dbab420e99085ca/v4/embed.html"
-                className="absolute top-0 left-0 w-full h-full"
-                style={{ border: 'none' }}
-                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                allowFullScreen
-              ></iframe>
+            <div className="relative w-full rounded-xl overflow-hidden bg-gray-900 shadow-md">
+              <vturb-smartplayer
+                id="vid-6930f7cb8f0253bca6641105"
+                style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}
+              ></vturb-smartplayer>
             </div>
 
             {!isButtonEnabled && (
