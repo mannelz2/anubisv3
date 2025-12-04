@@ -417,10 +417,10 @@ export default function AnalyticsPage() {
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <div className="text-gray-900 font-medium">
-                          {transaction.customer_name || (transaction.cpf ? `CPF: ${transaction.cpf}` : 'Sem dados')}
+                          {transaction.customer_name || 'Sem nome'}
                         </div>
                         <div className="text-gray-500 text-xs">
-                          {transaction.customer_email || (transaction.customer_phone || 'Email não disponível')}
+                          {transaction.cpf ? `CPF: ${transaction.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}` : 'CPF não disponível'}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
