@@ -7,8 +7,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
-const UTMIFY_API_URL = Deno.env.get("VITE_UTMIFY_API_URL") || "https://api.utmify.com.br/api-credentials/orders";
-const UTMIFY_API_TOKEN = Deno.env.get("VITE_UTMIFY_API_TOKEN");
+const UTMIFY_API_URL = Deno.env.get("UTMIFY_API_URL") || "https://api.utmify.com.br/api-credentials/orders";
+const UTMIFY_API_TOKEN = Deno.env.get("UTMIFY_API_TOKEN");
 
 interface UtmifyOrderPayload {
   orderId: string;
@@ -124,7 +124,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const supabaseUrl = Deno.env.get("VITE_SUPABASE_URL")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
