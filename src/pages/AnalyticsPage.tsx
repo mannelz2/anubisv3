@@ -42,11 +42,21 @@ interface Metrics {
   conversionRate: number;
 }
 
+interface CampaignMetrics {
+  campaignName: string;
+  totalSales: number;
+  paidSales: number;
+  conversionRate: number;
+  totalRevenue: number;
+  paidRevenue: number;
+}
+
 export default function AnalyticsPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
+  const [campaignMetrics, setCampaignMetrics] = useState<CampaignMetrics[]>([]);
   const [metrics, setMetrics] = useState<Metrics>({
     totalTransactions: 0,
     approvedTransactions: 0,
@@ -162,6 +172,45 @@ export default function AnalyticsPage() {
       averageTicket,
       conversionRate,
     });
+
+    calculateCampaignMetrics(data);
+  };
+
+  const calculateCampaignMetrics = (data: Transaction[]) => {
+    const campaignMap = new Map<string, CampaignMetrics>();
+
+    data.forEach(transaction => {
+      const campaignName = transaction.fb_campaign_name || transaction.utm_campaign || 'Sem campanha';
+
+      if (!campaignMap.has(campaignName)) {
+        campaignMap.set(campaignName, {
+          campaignName,
+          totalSales: 0,
+          paidSales: 0,
+          conversionRate: 0,
+          totalRevenue: 0,
+          paidRevenue: 0,
+        });
+      }
+
+      const campaign = campaignMap.get(campaignName)!;
+      campaign.totalSales += 1;
+      campaign.totalRevenue += transaction.amount;
+
+      if (transaction.status === 'approved' || transaction.status === 'completed' || transaction.status === 'authorized') {
+        campaign.paidSales += 1;
+        campaign.paidRevenue += transaction.amount;
+      }
+    });
+
+    const campaignsArray = Array.from(campaignMap.values()).map(campaign => ({
+      ...campaign,
+      conversionRate: campaign.totalSales > 0 ? (campaign.paidSales / campaign.totalSales) * 100 : 0,
+    }));
+
+    campaignsArray.sort((a, b) => b.totalSales - a.totalSales);
+
+    setCampaignMetrics(campaignsArray);
   };
 
   const exportToCSV = () => {
@@ -389,6 +438,77 @@ export default function AnalyticsPage() {
                 <option value="cancelled">Cancelado</option>
               </select>
             </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow overflow-hidden mb-6">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-bold text-gray-900">Desempenho por Campanha</h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Métricas de conversão e receita por campanha
+            </p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Campanha</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Vendas</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vendas Pagas</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Conversão</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Receita Total</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Receita Paga</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {campaignMetrics.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                      Nenhuma campanha encontrada
+                    </td>
+                  </tr>
+                ) : (
+                  campaignMetrics.map((campaign, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm">
+                        <div className="font-medium text-gray-900">
+                          {campaign.campaignName}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {campaign.totalSales}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <span className="font-medium text-green-600">
+                          {campaign.paidSales}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 bg-gray-200 rounded-full h-2 max-w-[100px]">
+                            <div
+                              className="bg-green-500 h-2 rounded-full"
+                              style={{ width: `${campaign.conversionRate}%` }}
+                            />
+                          </div>
+                          <span className="font-medium text-gray-900">
+                            {campaign.conversionRate.toFixed(1)}%
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {formatCurrency(campaign.totalRevenue)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <span className="font-medium text-green-600">
+                          {formatCurrency(campaign.paidRevenue)}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
