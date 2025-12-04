@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, AlertCircle, CheckCircle2, Settings, CreditCard, BarChart3 } from 'lucide-react';
+import { ArrowLeft, Save, AlertCircle, CheckCircle2, Settings, CreditCard, BarChart3, Send } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import UserLogsViewer from '../components/UserLogsViewer';
 import ReceiptsViewer from '../components/ReceiptsViewer';
@@ -25,6 +25,8 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [testingUtmify, setTestingUtmify] = useState(false);
+  const [utmifyTestResult, setUtmifyTestResult] = useState('');
   const [activeProvider, setActiveProvider] = useState<'genesys' | 'mangofy' | 'aureo'>('genesys');
   const [providers, setProviders] = useState<Record<string, ProviderSettings>>({
     genesys: {
@@ -126,7 +128,6 @@ export default function SettingsPage() {
         }
       }
 
-      // First, deactivate all providers to ensure only one is active
       await supabase
         .from('pix_provider_settings')
         .update({ is_active: false })
@@ -187,6 +188,68 @@ export default function SettingsPage() {
       setError(err.message || 'Erro ao salvar configurações');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleTestUtmify = async (status: 'approved' | 'pending') => {
+    try {
+      setTestingUtmify(true);
+      setUtmifyTestResult('');
+
+      const testTransaction = {
+        provider: 'test',
+        amount: 10.00,
+        status: status === 'approved' ? 'completed' : 'pending',
+        cpf: '12345678900',
+        customer_name: 'Cliente Teste Utmify',
+        customer_email: 'teste@utmify.com',
+        customer_phone: '11999999999',
+        customer_ip: '192.168.1.1',
+        description: 'Venda Teste - Utmify',
+        qr_code: '',
+        qr_code_base64: '',
+        pix_code: '',
+        external_transaction_id: `test-${Date.now()}`,
+        completed_at: status === 'approved' ? new Date().toISOString() : null,
+        src: 'test',
+        sck: 'test-campaign',
+        utm_source: 'test',
+        utm_campaign: 'campanha-teste',
+        utm_medium: 'test',
+        utm_content: 'test',
+        utm_term: 'test',
+      };
+
+      const { data: transaction, error: insertError } = await supabase
+        .from('transactions')
+        .insert(testTransaction)
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      const utmifyUrl = `${SUPABASE_URL}/functions/v1/utmify-integration`;
+      const response = await fetch(utmifyUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ transactionId: transaction.id }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Erro ao enviar para Utmify: ${errorText}`);
+      }
+
+      setUtmifyTestResult(
+        `Venda de R$ 10,00 ${status === 'approved' ? 'aprovada' : 'pendente'} enviada com sucesso para Utmify! ID: ${transaction.id}`
+      );
+    } catch (err: any) {
+      setUtmifyTestResult(`Erro: ${err.message}`);
+    } finally {
+      setTestingUtmify(false);
     }
   };
 
@@ -547,6 +610,80 @@ export default function SettingsPage() {
                 {saving ? 'Salvando...' : 'Salvar Configurações'}
               </span>
             </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto mb-6">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl">
+                <Send className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white">
+                  Testes Utmify
+                </h2>
+                <p className="text-white/90 mt-1">Envie vendas de teste para validar a integração</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6">
+            {utmifyTestResult && (
+              <div className={`mb-6 p-4 rounded-lg border-l-4 flex items-start gap-3 ${
+                utmifyTestResult.startsWith('Erro')
+                  ? 'bg-red-50 border-red-500'
+                  : 'bg-green-50 border-green-500'
+              }`}>
+                {utmifyTestResult.startsWith('Erro') ? (
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                )}
+                <p className={`text-sm font-medium ${
+                  utmifyTestResult.startsWith('Erro') ? 'text-red-800' : 'text-green-800'
+                }`}>
+                  {utmifyTestResult}
+                </p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button
+                onClick={() => handleTestUtmify('approved')}
+                disabled={testingUtmify}
+                className="group relative flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-4 rounded-xl hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-green-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <Send className={`w-5 h-5 relative z-10 ${testingUtmify ? 'animate-pulse' : ''}`} />
+                <div className="relative z-10 text-left">
+                  <div className="font-bold text-base">Enviar Venda Aprovada</div>
+                  <div className="text-sm text-green-100">R$ 10,00 - Status: Pago</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleTestUtmify('pending')}
+                disabled={testingUtmify}
+                className="group relative flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-4 rounded-xl hover:shadow-lg hover:shadow-orange-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-orange-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <Send className={`w-5 h-5 relative z-10 ${testingUtmify ? 'animate-pulse' : ''}`} />
+                <div className="relative z-10 text-left">
+                  <div className="font-bold text-base">Enviar Venda Pendente</div>
+                  <div className="text-sm text-orange-100">R$ 10,00 - Status: Aguardando</div>
+                </div>
+              </button>
+            </div>
+
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>Nota:</strong> Estes botões criam transações de teste no banco de dados e enviam para a Utmify.
+                Use para validar que a integração está funcionando corretamente.
+              </p>
+            </div>
           </div>
         </div>
       </div>
