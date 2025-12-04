@@ -25,6 +25,15 @@ export interface CreateMangofyTransactionRequest {
   utmTerm?: string;
   utmContent?: string;
   src?: string;
+  fbCampaignId?: string;
+  fbCampaignName?: string;
+  fbAdsetName?: string;
+  fbAdName?: string;
+  fbPlacement?: string;
+  domain?: string;
+  siteSource?: string;
+  trackingId?: string;
+  allUrlParams?: Record<string, string>;
 }
 
 export interface MangofyTransaction {
@@ -81,6 +90,15 @@ export async function createMangofyTransaction(
           utmTerm: data.utmTerm,
           utmContent: data.utmContent,
           src: data.src,
+          fbCampaignId: data.fbCampaignId,
+          fbCampaignName: data.fbCampaignName,
+          fbAdsetName: data.fbAdsetName,
+          fbAdName: data.fbAdName,
+          fbPlacement: data.fbPlacement,
+          domain: data.domain,
+          siteSource: data.siteSource,
+          trackingId: data.trackingId,
+          allUrlParams: data.allUrlParams,
         }),
       }
     );

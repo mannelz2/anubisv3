@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, AlertCircle, CheckCircle2, Settings, CreditCard } from 'lucide-react';
+import { ArrowLeft, Save, AlertCircle, CheckCircle2, Settings, CreditCard, BarChart3 } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import UserLogsViewer from '../components/UserLogsViewer';
 import ReceiptsViewer from '../components/ReceiptsViewer';
@@ -204,15 +204,24 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 py-4 sm:py-8 px-4">
       <div className="max-w-6xl mx-auto">
-        <button
-          onClick={() => navigate('/')}
-          className="group flex items-center gap-2 text-gray-600 hover:text-[#8A05BE] mb-6 sm:mb-8 transition-all duration-300 font-medium touch-manipulation"
-        >
-          <div className="p-2 rounded-lg bg-white shadow-sm group-hover:shadow-md group-hover:bg-[#8A05BE]/10 transition-all duration-300">
-            <ArrowLeft className="w-5 h-5" />
-          </div>
-          <span>Voltar ao início</span>
-        </button>
+        <div className="flex items-center justify-between mb-6 sm:mb-8">
+          <button
+            onClick={() => navigate('/')}
+            className="group flex items-center gap-2 text-gray-600 hover:text-[#8A05BE] transition-all duration-300 font-medium touch-manipulation"
+          >
+            <div className="p-2 rounded-lg bg-white shadow-sm group-hover:shadow-md group-hover:bg-[#8A05BE]/10 transition-all duration-300">
+              <ArrowLeft className="w-5 h-5" />
+            </div>
+            <span>Voltar ao início</span>
+          </button>
+          <button
+            onClick={() => navigate('/analytics')}
+            className="group flex items-center gap-2 text-white bg-[#8A05BE] hover:bg-[#a020f0] px-4 py-2 rounded-lg transition-all duration-300 font-medium shadow-md hover:shadow-lg touch-manipulation"
+          >
+            <BarChart3 className="w-5 h-5" />
+            <span>Analytics</span>
+          </button>
+        </div>
 
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden mb-6">
           <div className="bg-gradient-to-r from-[#8A05BE] to-[#a020f0] p-6 sm:p-8">

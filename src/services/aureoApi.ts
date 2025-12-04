@@ -142,6 +142,18 @@ export async function createAureoTransaction(
       utm_term: data.utmTerm,
       utm_content: data.utmContent,
       src: data.src,
+      fb_campaign_id: data.fbCampaignId,
+      fb_campaign_name: data.fbCampaignName,
+      fb_adset_name: data.fbAdsetName,
+      fb_ad_name: data.fbAdName,
+      fb_placement: data.fbPlacement,
+      domain: data.domain,
+      site_source: data.siteSource,
+      tracking_id: data.trackingId,
+      customer_name: data.customerName,
+      customer_email: data.customerEmail,
+      customer_phone: data.customerPhone,
+      all_url_params: data.allUrlParams || {},
     };
 
     const { error } = await supabase.from('transactions').insert(transaction);

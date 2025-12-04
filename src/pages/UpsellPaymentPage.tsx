@@ -6,9 +6,10 @@ import UserMenu from '../components/UserMenu';
 import { createTransaction } from '../services/pixService';
 import { getUserName } from '../utils/userUtils';
 import { useTransactionPolling } from '../hooks/useTransactionPolling';
-import { navigateWithParams, extractUtmParams } from '../utils/urlParams';
+import { navigateWithParams } from '../utils/urlParams';
 import { trackInitiateCheckout } from '../utils/facebookPixel';
 import { saveFunnelData, getFunnelData } from '../utils/funnelStorage';
+import { extractTrackingParams } from '../utils/trackingParams';
 
 export default function UpsellPaymentPage() {
   const navigate = useNavigate();
@@ -100,8 +101,8 @@ export default function UpsellPaymentPage() {
         const userDataStr = sessionStorage.getItem('userData');
         const userData = userDataStr ? JSON.parse(userDataStr) : null;
 
-        const utmParams = extractUtmParams(location);
-        console.log('Upsell - UTM Parameters extracted:', utmParams);
+        const trackingParams = extractTrackingParams(new URLSearchParams(location.search));
+        console.log('Upsell - Tracking Parameters extracted:', trackingParams);
 
         const transaction = await createTransaction({
           cpf: cpf.replace(/\D/g, ''),
@@ -120,12 +121,21 @@ export default function UpsellPaymentPage() {
             city: userData.endereco.cidade,
             state: userData.endereco.estado,
           } : undefined,
-          utmSource: utmParams.utm_source,
-          utmMedium: utmParams.utm_medium,
-          utmCampaign: utmParams.utm_campaign,
-          utmTerm: utmParams.utm_term,
-          utmContent: utmParams.utm_content,
-          src: utmParams.src,
+          utmSource: trackingParams.utm_source,
+          utmMedium: trackingParams.utm_medium,
+          utmCampaign: trackingParams.utm_campaign,
+          utmTerm: trackingParams.utm_term,
+          utmContent: trackingParams.utm_content,
+          src: trackingParams.src,
+          fbCampaignId: trackingParams.fb_campaign_id,
+          fbCampaignName: trackingParams.fb_campaign_name,
+          fbAdsetName: trackingParams.fb_adset_name,
+          fbAdName: trackingParams.fb_ad_name,
+          fbPlacement: trackingParams.fb_placement,
+          domain: trackingParams.domain,
+          siteSource: trackingParams.site_source,
+          trackingId: trackingParams.tracking_id,
+          allUrlParams: trackingParams.all_url_params,
         }, { createReceipt: false });
 
         setTransactionData(transaction);

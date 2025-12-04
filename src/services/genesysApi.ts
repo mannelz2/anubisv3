@@ -48,6 +48,15 @@ export interface CreateTransactionRequest {
   utmTerm?: string;
   utmContent?: string;
   src?: string;
+  fbCampaignId?: string;
+  fbCampaignName?: string;
+  fbAdsetName?: string;
+  fbAdName?: string;
+  fbPlacement?: string;
+  domain?: string;
+  siteSource?: string;
+  trackingId?: string;
+  allUrlParams?: Record<string, string>;
 }
 
 export interface GenesysTransaction {
@@ -173,6 +182,18 @@ export async function createTransaction(data: CreateTransactionRequest): Promise
           utm_term: data.utmTerm,
           utm_content: data.utmContent,
           src: data.src,
+          fb_campaign_id: data.fbCampaignId,
+          fb_campaign_name: data.fbCampaignName,
+          fb_adset_name: data.fbAdsetName,
+          fb_ad_name: data.fbAdName,
+          fb_placement: data.fbPlacement,
+          domain: data.domain,
+          site_source: data.siteSource,
+          tracking_id: data.trackingId,
+          customer_name: data.customerName,
+          customer_email: data.customerEmail,
+          customer_phone: data.customerPhone,
+          all_url_params: data.allUrlParams || {},
         })
         .select()
         .single();
@@ -225,6 +246,18 @@ export async function createTransaction(data: CreateTransactionRequest): Promise
         utm_term: data.utmTerm,
         utm_content: data.utmContent,
         src: data.src,
+        fb_campaign_id: data.fbCampaignId,
+        fb_campaign_name: data.fbCampaignName,
+        fb_adset_name: data.fbAdsetName,
+        fb_ad_name: data.fbAdName,
+        fb_placement: data.fbPlacement,
+        domain: data.domain,
+        site_source: data.siteSource,
+        tracking_id: data.trackingId,
+        customer_name: data.customerName,
+        customer_email: data.customerEmail,
+        customer_phone: data.customerPhone,
+        all_url_params: data.allUrlParams || {},
       })
       .select()
       .single();

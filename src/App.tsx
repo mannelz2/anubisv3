@@ -43,6 +43,7 @@ import UpsellPaymentPage from './pages/UpsellPaymentPage';
 import ReceiptUploadPage from './pages/ReceiptUploadPage';
 import FinalPage from './pages/FinalPage';
 import VSLPage from './pages/VSLPage';
+import AnalyticsPage from './pages/AnalyticsPage';
 import { initUserLogger } from './services/userLogger';
 import './App.css';
 
@@ -70,6 +71,8 @@ function App() {
         <Route path="/receipt-upload" element={<ReceiptUploadPage />} />
         <Route path="/enviar-comprovante" element={<ReceiptUploadPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/configuracoes" element={<SettingsPage />} />
+        <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/perguntas-perfil" element={<ProfileQuestionsPage />} />
         <Route path="/autorizacao-credito" element={<CreditAuthorizationPage />} />
         <Route path="/prioridade-emprestimo" element={<LoanPriorityPage />} />
